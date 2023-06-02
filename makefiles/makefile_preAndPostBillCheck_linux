@@ -1,0 +1,47 @@
+APPROOT:=${BASE_PATH}/billing/preAndPostBillCheck
+ABL_INC_PATH:=${BASE_PATH}/depends/servicesLayer/v1.3.6/include/
+ABL_LIB_PATH:=${BASE_PATH}/depends/servicesLayer/v1.3.6/lib/Linux/
+AMQP_INC_PATH:=${BASE_PATH}/depends/amqpWrapper/include
+AMQP_LIB_PATH:=${RELEASE_PATH}/billing/common/lib
+ORCH_MESG_INC_PATH:=${BASE_PATH}/billing/common/messageFormat/include
+ORCH_MESG_REL_LIB_PATH:=${RELEASE_PATH}/common/lib
+ORCH_MESG_DEB_LIB_PATH:=${RELEASE_PATH}/common/lib
+UTILS_INC_PATH:=${BASE_PATH}/billing/common/utils/include
+UTILS_REL_LIB_PATH:=${RELEASE_PATH}/common/lib
+UTILS_DEB_LIB_PATH:=${DEBUG_PATH}/common/lib
+REL_LIB_PATH:=${RELEASE_PATH}/preAndPostBillCheck/bin
+DEB_LIB_PATH:=${DEBUG_PATH}/preAndPostBillCheck/bin
+
+CCFLAGS:= -D BULK_FETCH_COUNT=512   -I${ABL_INC_PATH}  -I${AMQP_INC_PATH} -I${UTILS_INC_PATH} -I${ORCH_MESG_INC_PATH} -I${APPROOT}/include -fpermissive  -c -fPIC
+DLNFLAGS:=-lpthread -shared -Wl,-soname,$(LIBNAME).$(VER).so
+DLNFLAGSD:=-lpthread -shared -Wl,-soname,$(LIBNAMED).$(VER).so
+UNIT_TEST=-D $(UNIT)
+
+vpath %.cpp ${APPROOT}/source
+vpath %.h ${APPROOT}/include
+vpath %.o ${APPROOT}/objectfiles
+
+.SUFFIXES: .cpp .o .typ .h
+
+all: dynamic test
+
+application: ${OBJS}
+	g++  $(UNIT_TEST) -L${ABL_LIB_PATH} -L${REL_LIB_PATH} -L${ORCH_MESG_REL_LIB_PATH} -L${UTILS_REL_LIB_PATH} -o ${REL_LIB_PATH}/${EXE} ${APPROOT}/objectfiles/*.o  ${DEP_LIBS} -labl -lpthread -ldl
+	g++ -g $(UNIT_TEST) -L${ABL_LIB_PATH} -L${DEB_LIB_PATH} -L${ORCH_MESG_DEB_LIB_PATH} -L${UTILS_DEB_LIB_PATH} -o ${DEB_LIB_PATH}/${EXED} ${APPROOT}/objectfiles/debug/*.o  ${DEP_LIBSD} -labld -lpthread -ldl
+
+dynamic: ${OBJS}
+	g++ ${DLNFLAGS} -o ${REL_LIB_PATH}/$(LIBNAME).$(VER).so ${APPROOT}/objectfiles/*.o  -L${ABL_LIB_PATH} ${DEP_LIBS} -labl
+	g++ -g ${DLNFLAGSD} -o ${DEB_LIB_PATH}/$(LIBNAMED).$(VER).so ${APPROOT}/objectfiles/debug/*.o  -L${ABL_LIB_PATH} ${DEP_LIBSD} -labld 
+	ln -s $(LIBNAME).$(VER).so ${REL_LIB_PATH}/$(LIBNAME).so
+	ln -s $(LIBNAMED).$(VER).so ${DEB_LIB_PATH}/$(LIBNAMED).so
+
+test: ${OBJS}
+	g++ -g $(UNIT_TEST) -L${ABL_LIB_PATH} -o ${APPROOT}/bin/${EXE} ${APPROOT}/objectfiles/debug/*.o -labld -lpthread 
+
+.cpp.o: %.h
+	g++ $(UNIT_TEST) $(CCFLAGS) -o ${APPROOT}/objectfiles/$*.o ${APPROOT}/source/$*.cpp
+	g++ -g $(UNIT_TEST) $(CCFLAGS) -o ${APPROOT}/objectfiles/debug/$*.o ${APPROOT}/source/$*.cpp
+
+clean:
+	rm ${APPROOT}/objectfiles/*.o
+	rm ${APPROOT}/objectfiles/debug/*.o

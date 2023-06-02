@@ -1,0 +1,4 @@
+make -f ${BASE_PATH}/billing/preAndPostBillCheck/makefiles/makefile_preAndPostBillCheck_solaris clean
+make -f ${BASE_PATH}/billing/preAndPostBillCheck/makefiles/makefile_preAndPostBillCheck_solaris .cpp.o UNIT=NO_TEST OBJFILE="PreAndPostBillWrapperMain.o" SOURCEFILE="PreAndPostBillWrapperMain.cpp"
+make -f ${BASE_PATH}/billing/preAndPostBillCheck/makefiles/makefile_preAndPostBillCheck_solaris .cpp.o UNIT=NO_TEST OBJFILE="PreAndPostBillWrapper.o" SOURCEFILE="PreAndPostBillWrapper.cpp"
+make -f ${BASE_PATH}/billing/preAndPostBillCheck/makefiles/makefile_preAndPostBillCheck_solaris  application  UNIT=NO_TEST EXE="preAndPostBillCheck" EXED="preAndPostBillCheckd" DEP_LIBS=" -lmsgformat -lUtils " DEP_LIBSD=" -lmsgformatd -lUtilsd "

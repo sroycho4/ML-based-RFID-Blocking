@@ -1,0 +1,2 @@
+make -f${BASE_PATH}/billing/preAndPostBillCheck/makefiles/makefile_preAndPostBillCheck_linux clean
+make -f${BASE_PATH}/billing/preAndPostBillCheck/makefiles/makefile_preAndPostBillCheck_linux  application  UNIT=NO_TEST EXE="preAndPostBillCheck" EXED="preAndPostBillCheckd" OBJS="PreAndPostBillWrapperMain.o PreAndPostBillWrapper.o" DEP_LIBS=" -lmsgformat -lUtils " DEP_LIBSD=" -lmsgformatd -lUtilsd "
